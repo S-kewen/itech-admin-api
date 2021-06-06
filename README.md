@@ -9,6 +9,10 @@ demo: https://itech-admin.iskwen.com:88
 
 用戶端：https://github.com/S-kwen/itech-api
 
+## 相關文件
+報告文件：https://static.iskwen.com/skwen/file/iTech.pptx
+
+專案總述：https://static.iskwen.com/skwen/file/iTech.pdf
 
 ### 功能模塊
 ```
