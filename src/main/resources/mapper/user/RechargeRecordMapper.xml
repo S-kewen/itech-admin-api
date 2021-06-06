@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.user.RechargeRecordMapper">
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser"
+            resultType="com.boot.yuntechlifeadmin.entity.user.RechargeRecord">
+        select user.username,recharge_record.id,recharge_record.user_id,recharge_record.state,recharge_record.type,recharge_record.card_id,card.cdkey,card.amount,recharge_record.deleted,recharge_record.add_time from card,user,recharge_record where
+        recharge_record.user_id=user.id and recharge_record.deleted=false and card.id=recharge_record.card_id
+        <if test="keyword!=null and keyword!=''">and ( card.cdkey like CONCAT('%',#{keyword},'%') or user.username like CONCAT('%',#{keyword},'%') )
+        </if>
+        <if test="state!=null and state!=''">and recharge_record.state=#{state}</if>
+        <if test="type!=null and type!=''">and recharge_record.type=#{type}</if>
+        <if test="startTime!=null">and recharge_record.add_time&gt;=#{startTime}</if>
+        <if test="endTime!=null">and recharge_record.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.user.RechargeRecord">
+        update recharge_record set deleted=#{deleted}
+        where
+        id=#{id}
+        limit 1
+    </update>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.user.RechargeRecord" >
+        update recharge_record set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+    <update id="updateOne" parameterType="com.boot.yuntechlifeadmin.entity.user.RechargeRecord">
+        update recharge_record
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+        </set>
+        where id=#{id} limit 1
+    </update>
+    <update id="updateMore" parameterType="com.boot.yuntechlifeadmin.entity.user.RechargeRecord" >
+        update recharge_record
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+        </set>
+        where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.user.LoginRecordMapper">
+    <select id="getByIp" parameterType="com.boot.yuntechlifeadmin.entity.user.LoginRecord"
+            resultType="com.boot.yuntechlifeadmin.entity.user.LoginRecord">
+        select * from login_record where ip=#{ip} order by add_time desc limit 1
+    </select>
+    <insert id="insertOne" parameterType="com.boot.yuntechlifeadmin.entity.user.LoginRecord">
+        insert into login_record
+        values(0,#{user_id},#{state},#{type},#{ip},#{position},#{longitude},#{latitude},#{system},#{browser},#{header},false,CURRENT_TIMESTAMP())
+    </insert>
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser"
+            resultType="com.boot.yuntechlifeadmin.entity.user.LoginRecord">
+        select user.username,login_record.id,login_record.user_id,login_record.state,login_record.type,login_record.ip,login_record.position,login_record.longitude,login_record.latitude,login_record.system,login_record.browser,login_record.deleted,login_record.add_time from login_record,user
+        where login_record.user_id=user.id
+            <if test="keyword!=null and keyword!=''">and (login_record.ip like CONCAT('%',#{keyword},'%') or login_record.position like
+                CONCAT('%',#{keyword},'%') or login_record.system like CONCAT('%',#{keyword},'%') or login_record.browser like
+                CONCAT('%',#{keyword},'%') or user.username like CONCAT('%',#{keyword},'%'))
+            </if>
+            <if test="state!=null and state!=''">and login_record.state=#{state}</if>
+            <if test="type!=null and type!=''">and login_record.type=#{type}</if>
+            <if test="startTime!=null">and login_record.add_time&gt;=#{startTime}</if>
+            <if test="endTime!=null">and login_record.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.user.LoginRecord">
+        update login_record set deleted=#{deleted} where id=#{id} limit 1
+    </update>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.user.LoginRecord" >
+        update login_record set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+</mapper>

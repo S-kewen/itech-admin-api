@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.express.ExpressTakerMapper">
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser"
+            resultType="com.boot.yuntechlifeadmin.entity.express.ExpressTaker">
+        select user.username,express_taker.id,express_taker.user_id,express_taker.state,express_taker.type,express_taker.take_points,express_taker.express_type,express_taker.express_name,express_taker.express_num,express_taker.complete_time,express_taker.deleted,express_taker.add_time from express_taker,user where
+        express_taker.user_id=user.id
+        <if test="keyword!=null and keyword!=''">and (
+            express_taker.line like CONCAT('%',#{keyword},'%')
+            or express_taker.phone like CONCAT('%',#{keyword},'%')
+            or express_taker.appointment_points like CONCAT('%',#{keyword},'%')
+            or express_taker.express_name like CONCAT('%',#{keyword},'%')
+            or express_taker.express_num like CONCAT('%',#{keyword},'%')
+            or express_taker.recipient_name like CONCAT('%',#{keyword},'%')
+            or express_taker.recipient_phone like CONCAT('%',#{keyword},'%')
+            or express_taker.remark like CONCAT('%',#{keyword},'%')
+            or user.username like CONCAT('%',#{keyword},'%')
+            )
+        </if>
+        <if test="state!=null and state!=''">and express_taker.state=#{state}</if>
+        <if test="startTime!=null">and express_taker.add_time&gt;=#{startTime}</if>
+        <if test="endTime!=null">and express_taker.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressTaker">
+        update express_taker set deleted=#{deleted}
+        where
+        id=#{id}
+        and (state=5 or state=6 or state=8 or state=9)
+        limit 1
+    </update>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressTaker" >
+        update express_taker set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+        and (state=5 or state=6 or state=8 or state=9)
+    </update>
+    <update id="updateOne" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressTaker">
+        update express_taker
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+        </set>
+        where id=#{id}
+        <if test="state==3">and state=2</if>
+        <if test="state==4">and state=3</if>
+        <if test="state==6">and (state=1 or state=2)</if>
+        <if test="state==7">and state=3</if>
+        <if test="state==9">and state=7</if>
+        limit 1
+    </update>
+    <update id="updateMore" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressTaker" >
+        update express_taker
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+        </set>
+        where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+    <select id="getInfo" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressTaker" resultType="com.boot.yuntechlifeadmin.entity.express.ExpressTaker" >
+        select * from express_taker where id=#{id} limit 1
+    </select>
+</mapper>

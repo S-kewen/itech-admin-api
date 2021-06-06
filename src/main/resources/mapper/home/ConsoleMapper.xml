@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.home.ConsoleMapper">
+    <select id="getInfo" parameterType="com.boot.yuntechlifeadmin.entity.home.Console"
+            resultType="com.boot.yuntechlifeadmin.entity.home.Console">
+        SELECT
+        (
+        SELECT
+        pv_count
+        FROM
+        baidu_statistics
+        WHERE
+        site_id = #{site_id}
+        AND DATE_FORMAT( add_time, '%Y-%m-%d' ) = DATE_FORMAT( #{now_date}, '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        ) AS today_pv_count,
+        (
+        SELECT
+        sum( max_pv_count )
+        FROM
+        ( SELECT max( pv_count ) AS max_pv_count FROM baidu_statistics WHERE site_id = #{site_id}GROUP BY DATE_FORMAT( add_time, '%Y-%m-%d' ) ) temp2
+        ) AS all_pv_count,
+        ( SELECT count( * ) FROM USER ) AS user_count,
+        ( SELECT COUNT(*) from (SELECT DISTINCT user.id FROM USER,login_record WHERE user.id = login_record.user_id and login_record.type=1 and login_record.state=1 and DATE_FORMAT( login_record.add_time, '%Y-%m-%d' ) = DATE_FORMAT( #{now_date}, '%Y-%m-%d' ) )TEMP2 ) AS user_active_count,
+        (
+        SELECT
+        IFNULL( sum( amount ), 0 )
+        FROM
+        card
+        WHERE
+        state = 2
+        AND DATE_FORMAT( add_time, '%Y-%m-%d' ) = DATE_FORMAT( #{now_date}, '%Y-%m-%d' )
+        ) AS today_income,
+        ( SELECT IFNULL( sum( amount ), 0 ) FROM card WHERE state = 2 ) AS all_income,
+        (
+        SELECT
+        count( * )
+        FROM
+        express_taker
+        WHERE
+        ( state = 1 OR state = 2 OR state = 3 OR state = 4 OR state = 7 )
+        ) AS uncomplete_order_count,
+        ( SELECT count( * ) FROM express_taker ) AS order_count,
+
+        ( SELECT count( * ) FROM USER WHERE DATE_FORMAT( add_time, '%Y-%m-%d' ) != DATE_FORMAT( #{now_date}, '%Y-%m-%d' ) ) AS yesterday_user_count,
+        ( SELECT count( * ) FROM USER WHERE verified_state = 3 ) AS certification_user_count,
+        cpu,ram
+        from performance where service_id=#{service_id} and deleted=false ORDER BY id desc limit 1
+    </select>
+    <select id="getEcharts" parameterType="com.boot.yuntechlifeadmin.entity.home.Console" resultType="java.util.HashMap">
+        ( SELECT
+        DATE_FORMAT(#{now_date}, '%Y-%m-%d' ) as date,
+        (
+        SELECT
+        ifnull( pv_count, 0 )
+        FROM
+        baidu_statistics
+        WHERE
+        site_id = #{site_id}
+        AND date = DATE_FORMAT( #{now_date}, '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        ) AS pv,
+        ifnull( avg(cpu), 0 ) AS cpu,
+        ifnull( avg(ram), 0 ) AS ram
+        FROM
+        performance
+        WHERE
+        service_id = #{service_id}
+        AND DATE_FORMAT( add_time, '%Y-%m-%d' ) = DATE_FORMAT( #{now_date}, '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        )
+        UNION ALL
+        ( SELECT
+        DATE_FORMAT(date_sub(#{now_date}, INTERVAL 1 DAY ), '%Y-%m-%d' ) as date,
+        (
+        SELECT
+        ifnull( pv_count, 0 )
+        FROM
+        baidu_statistics
+        WHERE
+        site_id = #{site_id}
+        AND date = DATE_FORMAT( date_sub(#{now_date}, INTERVAL 1 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        ) AS pv,
+        ifnull( avg(cpu), 0 ) AS cpu,
+        ifnull( avg(ram), 0 ) AS ram
+        FROM
+        performance
+        WHERE
+        service_id = #{service_id}
+        AND DATE_FORMAT( add_time, '%Y-%m-%d' ) = DATE_FORMAT(date_sub(#{now_date}, INTERVAL 1 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        )
+        UNION ALL
+        ( SELECT
+        DATE_FORMAT(date_sub(#{now_date}, INTERVAL 2 DAY ), '%Y-%m-%d' ) as date,
+        (
+        SELECT
+        ifnull( pv_count, 0 )
+        FROM
+        baidu_statistics
+        WHERE
+        site_id = #{site_id}
+        AND date = DATE_FORMAT( date_sub(#{now_date}, INTERVAL 2 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        ) AS pv,
+        ifnull( avg(cpu), 0 ) AS cpu,
+        ifnull( avg(ram), 0 ) AS ram
+        FROM
+        performance
+        WHERE
+        service_id = #{service_id}
+        AND DATE_FORMAT( add_time, '%Y-%m-%d' ) = DATE_FORMAT(date_sub(#{now_date}, INTERVAL 2 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        )
+        UNION ALL
+        ( SELECT
+        DATE_FORMAT(date_sub(#{now_date}, INTERVAL 3 DAY ), '%Y-%m-%d' ) as date,
+        (
+        SELECT
+        ifnull( pv_count, 0 )
+        FROM
+        baidu_statistics
+        WHERE
+        site_id = #{site_id}
+        AND date = DATE_FORMAT( date_sub(#{now_date}, INTERVAL 3 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        ) AS pv,
+        ifnull( avg(cpu), 0 ) AS cpu,
+        ifnull( avg(ram), 0 ) AS ram
+        FROM
+        performance
+        WHERE
+        service_id = #{service_id}
+        AND DATE_FORMAT( add_time, '%Y-%m-%d' ) = DATE_FORMAT(date_sub(#{now_date}, INTERVAL 3 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        )
+        UNION ALL
+        ( SELECT
+        DATE_FORMAT(date_sub(#{now_date}, INTERVAL 4 DAY ), '%Y-%m-%d' ) as date,
+        (
+        SELECT
+        ifnull( pv_count, 0 )
+        FROM
+        baidu_statistics
+        WHERE
+        site_id = #{site_id}
+        AND date = DATE_FORMAT( date_sub(#{now_date}, INTERVAL 4 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        ) AS pv,
+        ifnull( avg(cpu), 0 ) AS cpu,
+        ifnull( avg(ram), 0 ) AS ram
+        FROM
+        performance
+        WHERE
+        service_id = #{service_id}
+        AND DATE_FORMAT( add_time, '%Y-%m-%d' ) = DATE_FORMAT(date_sub(#{now_date}, INTERVAL 4 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        )
+        UNION ALL
+        ( SELECT
+        DATE_FORMAT(date_sub(#{now_date}, INTERVAL 5 DAY ), '%Y-%m-%d' ) as date,
+        (
+        SELECT
+        ifnull( pv_count, 0 )
+        FROM
+        baidu_statistics
+        WHERE
+        site_id = #{site_id}
+        AND date = DATE_FORMAT( date_sub(#{now_date}, INTERVAL 5 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        ) AS pv,
+        ifnull( avg(cpu), 0 ) AS cpu,
+        ifnull( avg(ram), 0 ) AS ram
+        FROM
+        performance
+        WHERE
+        service_id = #{service_id}
+        AND DATE_FORMAT( add_time, '%Y-%m-%d' ) = DATE_FORMAT(date_sub(#{now_date}, INTERVAL 5 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        )
+        UNION ALL
+        ( SELECT
+        DATE_FORMAT(date_sub(#{now_date}, INTERVAL 6 DAY ), '%Y-%m-%d' ) as date,
+        (
+        SELECT
+        ifnull( pv_count, 0 )
+        FROM
+        baidu_statistics
+        WHERE
+        site_id = #{site_id}
+        AND date = DATE_FORMAT( date_sub(#{now_date}, INTERVAL 6 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        ) AS pv,
+        ifnull( avg(cpu), 0 ) AS cpu,
+        ifnull( avg(ram), 0 ) AS ram
+        FROM
+        performance
+        WHERE
+        service_id = #{service_id}
+        AND DATE_FORMAT( add_time, '%Y-%m-%d' ) = DATE_FORMAT(date_sub(#{now_date}, INTERVAL 6 DAY ), '%Y-%m-%d' )
+        ORDER BY
+        id DESC
+        LIMIT 1
+        )
+    </select>
+    <select id="getFeedbackList" resultType="java.util.HashMap" >
+        select feedback.id,feedback.state,feedback.type,feedback.content,feedback.add_time,if(feedback.anonymous=1,user.username,'匿名') as username
+        from user,feedback where feedback.user_id=user.id and feedback.deleted=false
+    </select>
+</mapper>

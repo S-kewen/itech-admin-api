@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.user.TransactionMapper">
+    <insert id="insertOne" parameterType="com.boot.yuntechlifeadmin.entity.user.Transaction">
+        insert into transaction
+        values(0,#{user_id},#{state},#{type},#{title},#{amount},#{commission},#{actual_amount},0,false,CURRENT_TIMESTAMP())
+    </insert>
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser"
+            resultType="com.boot.yuntechlifeadmin.entity.user.Transaction">
+        select user.username,transaction.id,transaction.user_id,transaction.state,transaction.type,transaction.title,transaction.amount,transaction.commission,transaction.actual_amount,transaction.balance,transaction.deleted,transaction.add_time from transaction,user where
+        transaction.user_id=user.id
+        <if test="keyword!=null and keyword!=''">and (transaction.title like CONCAT('%',#{keyword},'%') or user.username like CONCAT('%',#{keyword},'%'))</if>
+        <if test="state!=null and state!=''">and transaction.state=#{state}</if>
+        <if test="type!=null and type!=''">and transaction.type=#{type}</if>
+        <if test="startTime!=null">and transaction.add_time&gt;=#{startTime}</if>
+        <if test="endTime!=null">and transaction.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.user.Transaction">
+        update transaction set deleted=#{deleted}
+        where  id=#{id}
+        limit 1
+    </update>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.user.Transaction" >
+        update transaction set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+</mapper>

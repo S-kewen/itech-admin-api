@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.user.NewsMapper">
+    <insert id="insertOne" parameterType="com.boot.yuntechlifeadmin.entity.user.News">
+        insert into news values(0,#{user_id},#{state},#{type},#{sender},#{title},#{msg},false,CURRENT_TIMESTAMP())
+    </insert>
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser"
+            resultType="com.boot.yuntechlifeadmin.entity.user.News">
+        select user.username,news.id,news.user_id,news.state,news.type,news.sender,news.title,news.msg,news.deleted,news.add_time from news,user where news.user_id=user.id
+        <if test="keyword!=null and keyword!=''">and (news.sender like CONCAT('%',#{keyword},'%') or news.title like
+            CONCAT('%',#{keyword},'%') or news.msg like CONCAT('%',#{keyword},'%') or user.username like CONCAT('%',#{keyword},'%'))
+        </if>
+            <if test="state!=null and state!=''">and news.state=#{state}</if>
+            <if test="type!=null and type!=''">and news.type=#{type}</if>
+            <if test="startTime!=null">and news.add_time&gt;=#{startTime}</if>
+            <if test="endTime!=null">and news.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.user.News">
+        update news set deleted=#{deleted} where id=#{id} limit 1
+    </update>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.user.News" >
+        update news set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+</mapper>

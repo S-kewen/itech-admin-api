@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.system.NoticeMapper">
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser"
+            resultType="com.boot.yuntechlifeadmin.entity.system.Notice">
+        select admin_user.username,notice.id,notice.user_id,notice.state,notice.type,notice.top,notice.title,notice.show_time,notice.hide_time,notice.jump_type,notice.lay_text,notice.url,notice.content,notice.show_time,notice.deleted,notice.add_time from notice,admin_user where
+        notice.user_id=admin_user.id and notice.deleted=false
+        <if test="keyword!=null and keyword!=''">and ( notice.title like CONCAT('%',#{keyword},'%') or notice.lay_text like
+            CONCAT('%',#{keyword},'%') or notice.url like CONCAT('%',#{keyword},'%')  or notice.content like CONCAT('%',#{keyword},'%') or admin_user.username like CONCAT('%',#{keyword},'%') )
+        </if>
+        <if test="state!=null and state!=''">and notice.state=#{state}</if>
+        <if test="type!=null and type!=''">and notice.type=#{type}</if>
+        <if test="top!=null and top!=''">and notice.top=#{top}</if>
+        <if test="startTime!=null">and notice.add_time&gt;=#{startTime}</if>
+        <if test="endTime!=null">and notice.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.system.Notice">
+        update notice set deleted=#{deleted}
+        where
+        id=#{id}
+        limit 1
+    </update>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.system.Notice" >
+        update notice set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+    <update id="updateOne" parameterType="com.boot.yuntechlifeadmin.entity.system.Notice">
+        update notice
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+            <if test="type!=null and type!=''">type=#{type},</if>
+            <if test="top!=null and top!=''">top=#{top},</if>
+            <if test="title!=null and title!=''">title=#{title},</if>
+            <if test="show_time!=null">show_time=#{show_time},</if>
+            <if test="hide_time!=null">hide_time=#{hide_time},</if>
+            <if test="jump_type!=null and jump_type!=''">jump_type=#{jump_type},</if>
+            <if test="lay_text!=null">lay_text=#{lay_text},</if>
+            <if test="url!=null and url!=''">url=#{url},</if>
+            <if test="content!=null and content!=''">content=#{content},</if>
+        </set>
+        where id=#{id} limit 1
+    </update>
+    <update id="updateMore" parameterType="com.boot.yuntechlifeadmin.entity.system.Notice" >
+        update notice
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+        </set>
+        where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+    <insert id="insertOne" parameterType="com.boot.yuntechlifeadmin.entity.system.Notice" >
+        insert into notice values(0,#{user_id},#{state},#{type},#{top},#{title},#{show_time},#{hide_time},#{jump_type},#{lay_text},#{url},#{content},false,CURRENT_TIMESTAMP())
+    </insert>
+    <select id="getInfo" parameterType="com.boot.yuntechlifeadmin.entity.system.Notice" resultType="com.boot.yuntechlifeadmin.entity.system.Notice">
+        select * from notice where id=#{id} and deleted=false limit 1
+    </select>
+</mapper>

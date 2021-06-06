@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.system.MessageQueueMapper">
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser"
+            resultType="com.boot.yuntechlifeadmin.entity.system.MessageQueue">
+        select user.username,message_queue.id,message_queue.user_id,message_queue.state,message_queue.type,message_queue.retry_num,message_queue.try_num,message_queue.to,message_queue.title,message_queue.remark,message_queue.complete_time,message_queue.deleted,message_queue.add_time from message_queue,user where
+        message_queue.user_id=user.id and message_queue.deleted=false
+        <if test="keyword!=null and keyword!=''">and (
+            message_queue.to like CONCAT('%',#{keyword},'%')
+            or message_queue.to like CONCAT('%',#{keyword},'%')
+            or message_queue.title like CONCAT('%',#{keyword},'%')
+            or message_queue.msg like CONCAT('%',#{keyword},'%')
+            or message_queue.remark like CONCAT('%',#{keyword},'%')
+            or user.username like CONCAT('%',#{keyword},'%')
+            )
+        </if>
+        <if test="state!=null and state!=''">and message_queue.state=#{state}</if>
+        <if test="type!=null and type!=''">and message_queue.type=#{type}</if>
+        <if test="startTime!=null">and message_queue.add_time&gt;=#{startTime}</if>
+        <if test="endTime!=null">and message_queue.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.system.MessageQueue">
+        update message_queue set deleted=#{deleted}
+        where
+        id=#{id}
+        limit 1
+    </update>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.system.MessageQueue" >
+        update message_queue set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+    <update id="updateOne" parameterType="com.boot.yuntechlifeadmin.entity.system.MessageQueue">
+        update message_queue
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+        </set>
+        where id=#{id} limit 1
+    </update>
+    <update id="updateMore" parameterType="com.boot.yuntechlifeadmin.entity.system.MessageQueue" >
+        update message_queue
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+        </set>
+        where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+    <select id="getInfo" parameterType="com.boot.yuntechlifeadmin.entity.system.MessageQueue" resultType="com.boot.yuntechlifeadmin.entity.system.MessageQueue" >
+        select * from message_queue where id=#{id} and deleted=false limit 1
+    </select>
+</mapper>

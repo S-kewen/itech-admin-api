@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.user.BindingLineMapper">
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser"
+            resultType="com.boot.yuntechlifeadmin.entity.user.BindingLine">
+        select user.username,binding_line.id,binding_line.user_id,binding_line.state,binding_line.type,binding_line.language,binding_line.view_type,binding_line.line_user_id,binding_line.utou_id,binding_line.room_id,binding_line.group_id,binding_line.ip,binding_line.system,binding_line.browser,binding_line.deleted,binding_line.add_time from binding_line,user where
+        binding_line.user_id=user.id and binding_line.deleted=false
+        <if test="keyword!=null and keyword!=''">and (
+            binding_line.language like CONCAT('%',#{keyword},'%')
+            or binding_line.view_type like CONCAT('%',#{keyword},'%')
+            or binding_line.line_user_id like CONCAT('%',#{keyword},'%')
+            or binding_line.utou_id like CONCAT('%',#{keyword},'%')
+            or binding_line.room_id like CONCAT('%',#{keyword},'%')
+            or binding_line.group_id like CONCAT('%',#{keyword},'%')
+            or binding_line.ip like CONCAT('%',#{keyword},'%')
+            or binding_line.system like CONCAT('%',#{keyword},'%')
+            or binding_line.browser like CONCAT('%',#{keyword},'%')
+            or user.username like CONCAT('%',#{keyword},'%')
+            )
+        </if>
+        <if test="state!=null and state!=''">and binding_line.state=#{state}</if>
+        <if test="type!=null and type!=''">and binding_line.type=#{type}</if>
+        <if test="startTime!=null">and binding_line.add_time&gt;=#{startTime}</if>
+        <if test="endTime!=null">and binding_line.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.user.BindingLine">
+        update binding_line set deleted=#{deleted}
+        where
+        id=#{id}
+        limit 1
+    </update>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.user.BindingLine" >
+        update binding_line set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+    <update id="updateOne" parameterType="com.boot.yuntechlifeadmin.entity.user.BindingLine">
+        update binding_line
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+            <if test="type!=null and type!=''">type=#{type},</if>
+            <if test="line_user_id!=null and line_user_id!=''">line_user_id=#{line_user_id},</if>
+        </set>
+        where id=#{id} and deleted=false limit 1
+    </update>
+    <update id="updateMore" parameterType="com.boot.yuntechlifeadmin.entity.user.BindingLine" >
+        update binding_line
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+        </set>
+        where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+        and deleted=false
+    </update>
+    <select id="getInfo" parameterType="com.boot.yuntechlifeadmin.entity.user.BindingLine" resultType="com.boot.yuntechlifeadmin.entity.user.BindingLine">
+        select * from binding_line where id=#{id} and deleted=false limit 1
+    </select>
+</mapper>

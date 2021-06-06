@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.flow.YuntechFlowConfigMapper">
+    <select id="getById" parameterType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowConfig"
+            resultType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowConfig">
+        select * from yuntech_flow_config where user_id=#{user_id} and deleted=false limit 1
+    </select>
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser" resultType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowConfig" >
+        select user.username,yuntech_flow_config.id,yuntech_flow_config.user_id,yuntech_flow_config.state,yuntech_flow_config.max_enable,yuntech_flow_config.remark,yuntech_flow_config.deleted,yuntech_flow_config.add_time from yuntech_flow_config,user
+        where yuntech_flow_config.user_id=user.id
+        <if test="keyword!=null and keyword!=''">and (yuntech_flow_config.remark like CONCAT('%',#{keyword},'%') or user.username like CONCAT('%',#{keyword},'%'))
+        </if>
+        <if test="state!=null and state!=''">and yuntech_flow_config.state=#{state}</if>
+        <if test="startTime!=null">and yuntech_flow_config.add_time&gt;=#{startTime}</if>
+        <if test="endTime!=null">and yuntech_flow_config.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="updateMore" parameterType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowConfig" >
+        update yuntech_flow_config
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+            <if test="max_enable!=null and max_enable!=''">max_enable=#{max_enable},</if>
+        </set>
+        where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+    <update id="updateOne" parameterType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowConfig" >
+        update yuntech_flow_config
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+            <if test="max_enable!=null and max_enable!=''">max_enable=#{max_enable},</if>
+        </set>
+        where id=#{id} and deleted=false limit 1
+    </update>
+</mapper>

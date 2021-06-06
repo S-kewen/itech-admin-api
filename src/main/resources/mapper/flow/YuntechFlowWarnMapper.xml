@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.flow.YuntechFlowWarnMapper">
+    <insert id="insertOne" parameterType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowWarn">
+        insert into yuntech_flow_warn
+        values(0,#{user_id},#{ip},#{warn_value},#{real_value},#{warn_mail},#{mail_state},#{warn_phone},#{phone_state},#{complete_time},false,CURRENT_TIMESTAMP())
+    </insert>
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser"
+            resultType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowWarn">
+        select
+        user.username,yuntech_flow_warn.id,yuntech_flow_warn.user_id,ip,yuntech_flow_warn.warn_value,yuntech_flow_warn.real_value,yuntech_flow_warn.warn_mail,yuntech_flow_warn.mail_state,yuntech_flow_warn.warn_phone,yuntech_flow_warn.phone_state,yuntech_flow_warn.complete_time,yuntech_flow_warn.deleted,yuntech_flow_warn.add_time
+        from yuntech_flow_warn,user where
+        yuntech_flow_warn.user_id=user.id
+        <if test="keyword!=null and keyword!=''">and ( yuntech_flow_warn.ip like CONCAT('%',#{keyword},'%') or yuntech_flow_warn.warn_mail like
+            CONCAT('%',#{keyword},'%') or yuntech_flow_warn.warn_phone like CONCAT('%',#{keyword},'%') or user.username like CONCAT('%',#{keyword},'%'))
+        </if>
+        <if test="state!=null and state!=''">and (yuntech_flow_warn.mail_state=#{state} or yuntech_flow_warn.phone_state=#{state})</if>
+        <if test="startTime!=null">and yuntech_flow_warn.add_time&gt;=#{startTime}</if>
+        <if test="endTime!=null">and yuntech_flow_warn.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowWarn">
+        update yuntech_flow_warn set deleted=#{deleted}
+        where
+        id=#{id}
+        limit 1
+    </update>
+    <update id="updateOne" parameterType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowWarn">
+        update yuntech_flow_warn
+        <set>
+            <if test="mail_state!=null and mail_state!=''">mail_state=#{mail_state},</if>
+            <if test="phone_state!=null and phone_state!=''">phone_state=#{phone_state},</if>
+        </set>
+        where id=#{id} limit 1
+    </update>
+    <select id="disposeWarn" parameterType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowWarn"
+            resultType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowWarn">
+        select * from yuntech_flow_warn where mail_state=5 or phone_state=5 and deleted=false order by id
+    </select>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.flow.YuntechFlowWarn" >
+        update yuntech_flow_warn set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+</mapper>

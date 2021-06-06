@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.express.ExpressScoreMapper">
+    <insert id="insertOne" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressScore">
+        insert into express_score
+        values(0,#{user_id},#{from_user_id},#{express_taker_id},#{state},#{type},#{anonymous},#{score},#{comments},false,CURRENT_TIMESTAMP())
+    </insert>
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser" resultType="com.boot.yuntechlifeadmin.entity.express.ExpressScore" >
+        select
+        user.username,express_score.id,express_score.user_id,express_score.from_user_id,express_score.express_taker_id,express_score.state,express_score.type,express_score.anonymous,express_score.score,express_score.comments,express_score.deleted,express_score.add_time
+        from express_score,user where express_score.user_id=user.id
+        <if test="keyword!=null and keyword!=''">and ( express_score.comments like CONCAT('%',#{keyword},'%') or user.username like CONCAT('%',#{keyword},'%'))
+        </if>
+        <if test="state!=null and state!=''">and express_score.state=#{state}</if>
+        <if test="type!=null and type!=''">and express_score.type=#{type}</if>
+        <if test="anonymous!=null and anonymous!=''">and express_score.anonymous=#{anonymous}</if>
+        <if test="startTime!=null">and express_score.add_time&gt;=#{startTime}</if>
+        <if test="endTime!=null">and express_score.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressScore" >
+        update express_score set deleted=#{deleted} where id=#{id} limit 1
+    </update>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressScore" >
+        update express_score set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+</mapper>

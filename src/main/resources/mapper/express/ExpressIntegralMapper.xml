@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.yuntechlifeadmin.dao.express.ExpressIntegralMapper">
+    <select id="getByUserId" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressIntegral"
+            resultType="com.boot.yuntechlifeadmin.entity.express.ExpressIntegral">
+        select * from express_integral where user_id=#{user_id} and deleted=false limit 1
+    </select>
+    <select id="getList" parameterType="com.boot.yuntechlifeadmin.entity.adminUser.AdminUser" resultType="com.boot.yuntechlifeadmin.entity.express.ExpressIntegral" >
+        select
+        user.username,express_integral.id,express_integral.user_id,express_integral.state,express_integral.grade,express_integral.deleted,express_integral.add_time
+        from express_integral,user where express_integral.user_id=user.id and express_integral.deleted=false
+        <if test="keyword!=null and keyword!=''">and user.username like CONCAT('%',#{keyword},'%')</if>
+        <if test="state!=null and state!=''">and express_integral.state=#{state}</if>
+        <if test="startTime!=null">and express_integral.add_time&gt;=#{startTime}</if>
+        <if test="endTime!=null">and express_integral.add_time&lt;=#{endTime}</if>
+    </select>
+    <update id="deleteOne" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressIntegral" >
+        update express_integral set deleted=#{deleted} where id=#{id} limit 1
+    </update>
+    <update id="deleteMore" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressIntegral" >
+        update express_integral set deleted=#{deleted} where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+    <update id="updateOne" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressIntegral" >
+        update express_integral
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+        </set>
+        where id=#{id} limit 1
+    </update>
+    <update id="updateMore" parameterType="com.boot.yuntechlifeadmin.entity.express.ExpressIntegral" >
+        update express_integral
+        <set>
+            <if test="state!=null and state!=''">state=#{state},</if>
+        </set>
+        where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </update>
+</mapper>
