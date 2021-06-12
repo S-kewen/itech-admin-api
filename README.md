@@ -4,7 +4,7 @@ itech - 榮獲 【專題人氣獎第二名】 【研討會嘉獎】
 
 demo: https://itech-admin.iskwen.com:88
 
-前端：https://github.com/S-kwen/itech-admin-views
+前端：https://github.com/S-kwen/itech-admin-view
 
 用戶端：https://github.com/S-kwen/itech-api
 
